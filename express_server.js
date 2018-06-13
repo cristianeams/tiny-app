@@ -4,7 +4,7 @@ const app = express();
 
 //Require  and use morgan
 const morgan = require('morgan');
-app.use(morgan('combined'))
+app.use(morgan('dev'));
 
 //Start the server
 var PORT = 8080;
@@ -58,11 +58,20 @@ app.post("/urls", (req, res) => {
     res.redirect("/urls/" + shortURL);
 });
 
+//Post route to remove an URL
+app.post("/urls/:id/delete", (req, res) => {
+    // console.log(req.params.ids);
+    delete urlDatabase[req.params.id];
+   res.redirect("/urls");
+
+});
+
 app.get("/u/:shortURL", (req, res) => {
     //console.log(req.params.shortURL)
     var longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
 });
+
 
 
 
