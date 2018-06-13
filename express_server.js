@@ -14,38 +14,24 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 function generateRandomString() {
-    var result = '';
-    const possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = "";
+    const possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     for (let i = 0; i < 6; i++) { 
       result += possibilities.charAt(Math.floor(Math.random() * possibilities.length)); 
     }
-      return result;
+    
+    return result;
 };
-  
-  generateRandomString();
-
 
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+    "9sm5xK": "http://www.google.com",
 };
 
-// app.get("/", function (req, res) {
-//     res.end("Hello");
-
-// });
-
-// app.get("/urls.json", function (req, res) {
-//     res.json(urlDatabase);
-// })
-
-// app.get("/hello", function (req, res) {
-//     res.end("<html><body>Hello <b> World</b></html>\n");
-
-// });
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };
-    res.render("urls_index", templateVars);
+  let templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
 });
 
 //Get Route to Show the Form
@@ -60,11 +46,19 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    console.log(req.body);  // debug statement to see POST parameters
-    res.send("Ok");         // Respond with 'Ok' (we will replace this)
-  });
+    var shortURL = generateRandomString();
+    var longURL = req.body.longURL;
+    urlDatabase[shortURL] = longURL;
+    res.redirect(longURL);
+});
 
-app.listen(PORT, function () {
+app.get("/u/:shortURL", (req, res) => {
+    //console.log(req.params.shortURL)
+    var longURL = urlDatabase[req.params.shortURL];
+    res.redirect(longURL);
+});
+
+app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
 });
 
