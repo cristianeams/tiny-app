@@ -2,12 +2,17 @@
 const express = require("express");
 const app = express();
 
-//Require  and use morgan
+//Require and Use morgan
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
+
+//Require and use Cookie Parser
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 //Start the server
-var PORT = 8080;
+const PORT = 8080;
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
 });
@@ -15,12 +20,12 @@ app.listen(PORT, () => {
 //Sets Ejs as templating engine
 app.set("view engine", "ejs");
 
-//Use Body Parser Library to acccess Post Request Parameters
+//Require and Use Body Parser Library to acccess Post Request Parameters
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 function generateRandomString() {
-    var result = "";
+    let result = "";
     const possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for (let i = 0; i < 6; i++) { 
@@ -30,7 +35,7 @@ function generateRandomString() {
     return result;
 };
 
-var urlDatabase = {
+let urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xK": "http://www.google.com",
 };
@@ -52,8 +57,8 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    var shortURL = generateRandomString();
-    var longURL = req.body.longURL;
+    let shortURL = generateRandomString();
+    let longURL = req.body.longURL;
     urlDatabase[shortURL] = longURL;
     res.redirect("/urls/");
 });
@@ -69,7 +74,7 @@ app.post("/urls/:id/delete", (req, res) => {
 //Change longURL to the new value of newURL
 app.post("/urls/:id", (req, res) => {
     let id = req.params.id;
-    var longURL = req.body.longURL;
+    let longURL = req.body.longURL;
     urlDatabase[id] = longURL;
    res.redirect("/urls");
 
@@ -78,7 +83,7 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
     //console.log(req.params.shortURL)
-    var longURL = urlDatabase[req.params.shortURL];
+    let longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
 });
 
