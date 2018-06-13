@@ -55,7 +55,7 @@ app.post("/urls", (req, res) => {
     var shortURL = generateRandomString();
     var longURL = req.body.longURL;
     urlDatabase[shortURL] = longURL;
-    res.redirect("/urls/" + shortURL);
+    res.redirect("/urls/");
 });
 
 //Post route to remove an URL
@@ -65,12 +65,14 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 //Post route to update an URL
+//Set id to params
+//Change longURL to the new value of newURL
 app.post("/urls/:id", (req, res) => {
     let id = req.params.id;
     var longURL = req.body.longURL;
     urlDatabase[id] = longURL;
    res.redirect("/urls");
-   
+
 });
 
 
