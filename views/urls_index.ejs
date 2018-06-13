@@ -4,14 +4,30 @@
 <head>
     <% include partials/_header %>
 </head>
-<body style="margin-left: 5em">
+<body>
     <!-- EJS Code -->
-    <h1>Your short URLs</h1>
-    <ul style="list-style-type: none">
-      <% for (var item in urls) { %>
-        <li><a href="#"><%= item %></a> ( <%= urls[item] %> )</li>
-      <% }; %>
-      
-    </ul>
+  <div class="container"> 
+    <h1 class="display-5 ml-1 p-3">Your short URLs</h1>
+    <table class="table table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Short URL</th>
+            <th scope="col">Long URL:</th>
+          </tr>
+        </thead>
+        <tbody>
+            
+            <% for (var item in urls) { %>
+            <tr> 
+                <th scope="row">#</th>
+
+                <td><a href="#"><%= item %></a></td>
+                <td>( <%= urls[item] %> )</td>
+            </tr>
+            <% }; %>   
+          </tbody>
+        </table>
+  </div>  
 </body>
 </html>

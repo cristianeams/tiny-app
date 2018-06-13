@@ -1,16 +1,22 @@
-//Require express
-var express = require("express");
-var app = express();
+//Require express and Initialize expresss
+const express = require("express");
+const app = express();
 
-//Default port
+//Require  and use morgan
+const morgan = require('morgan');
+app.use(morgan('combined'))
+
+//Start the server
 var PORT = 8080;
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}`);
+});
 
 //Sets Ejs as templating engine
 app.set("view engine", "ejs");
 
 //Use Body Parser Library to acccess Post Request Parameters
 const bodyParser = require("body-parser");
-
 app.use(bodyParser.urlencoded({extended: true}));
 
 function generateRandomString() {
@@ -58,8 +64,6 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(longURL);
 });
 
-app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
-});
+
 
 

@@ -6,10 +6,17 @@
     <% include partials/_header %>
 </head>
 <body>
-    <!-- EJS Code -->
-    <h1>Short URL</h1>
-    <h2>Your short URL is : <%= shortURL %> for  <%= longURL %></h2>
+  <div class="container">   
       
-    </ul>
+    <!-- EJS Code -->
+    <h1 class="display-5 ml-1 p-3">Short URL</h1>
+    <a href="/urls" class="btn btn-secondary">Back to URLs</a>
+    <div class="form-group">
+      <class="form-control">Short Url:<br>
+        <p class="form-control"><%= shortURL %></p>
+      <class="form-control">Long Url:<br>
+        <p class="form-control"><%= longURL %></p>
+    </div>
+  </div>    
 </body>
 </html>
