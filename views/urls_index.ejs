@@ -22,8 +22,7 @@
             <% for (var item in urls) { %>
             <tr> 
                 <th scope="row">#</th>
-
-                <td><a href="#"><%= item %></a></td>
+                <td><a href="/urls/<%= item %>"><%= item %></a></td>
                 <td>( <%= urls[item] %> )</td>
                 <td><form method="POST" action="/urls/<%= item %>/delete">
                   <button type="delete" value="Delete" class="btn btn-danger">Delete</button>

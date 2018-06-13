@@ -12,10 +12,11 @@
     <h1 class="display-5 ml-1 p-3">Short URL</h1>
     <a href="/urls" class="btn btn-secondary">Back to URLs</a>
     <div class="form-group">
-      <class="form-control">Short Url:<br>
-        <p class="form-control"><%= shortURL %></p>
-      <class="form-control">Long Url:<br>
-        <p class="form-control"><%= longURL %></p>
+      <h2>Short Url: <%= shortURL %> </h2> 
+      <form method="POST" action="/urls/<%= shortURL %>" class="form-control">
+        <input type="text" class="form-control" value="<%= longURL %>" name="longURL"></input>
+        <button type="update" value="<%= longURL %>" class="btn btn-info">Update</button>
+      </form>  
     </div>
   </div>    
 </body>

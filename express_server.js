@@ -60,11 +60,19 @@ app.post("/urls", (req, res) => {
 
 //Post route to remove an URL
 app.post("/urls/:id/delete", (req, res) => {
-    // console.log(req.params.ids);
     delete urlDatabase[req.params.id];
    res.redirect("/urls");
-
 });
+
+//Post route to update an URL
+app.post("/urls/:id", (req, res) => {
+    let id = req.params.id;
+    var longURL = req.body.longURL;
+    urlDatabase[id] = longURL;
+   res.redirect("/urls");
+   
+});
+
 
 app.get("/u/:shortURL", (req, res) => {
     //console.log(req.params.shortURL)
