@@ -127,8 +127,9 @@ app.post("/register", (req, res) => {
     password: password 
   }; 
   users[newUser.id] = newUser;
-  res.cookie('user_id', newUser.id);
-  console.log(users);
+  //console.log(users)
+  res.cookie("user_id", newUser.id)
+  res.cookie("email", newUser.email);
   res.redirect("/register");
 });
 
