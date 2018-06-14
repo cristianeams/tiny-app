@@ -40,44 +40,86 @@ let urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-//Creates an User Object
-const users = { 
-//   "userRandomID": {
-//     id: this.id, 
-//     email: "user@example.com", 
-//     password: "purple-monkey-dinosaur"
-//   },
-//  "user2RandomID": {
-//     id: "user2RandomID", 
-//     email: "user2@example.com", 
-//     password: "dishwasher-funk"
-//   }
+//Creates an users Database 
+const usersDB = { 
+  "user1RandomID": {
+    id: "user1RandomID",
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
 };
 
+
+//========= GET METHODS ======
+
 app.get("/urls", (req, res) => {
+  const user = usersDBLookup(req.cookies["user_id"]);
+  //console.log(req.cookies["user_id"]);
   let templateVars = { 
     urls: urlDatabase, 
-    username: req.cookies["username"]
+    user: usersDB
   };
+  
   res.render("urls_index", templateVars);
 });
 
 //Get Route to Show the Form
 //The new route matches :id pattern, so defining it before will take precedence.
 app.get("/urls/new", (req, res) => {
+  const user = usersDBLookup(req.cookies["user_id"]);
   let templateVars = {
-    username: req.cookies["username"],
+    users: user
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
+  const user = usersDBLookup(req.cookies["user_id"]);
   let templateVars = { shortURL: req.params.id, 
     longURL: urlDatabase[req.params.id], 
-    username: req.cookies["username"]};
+    user: user
+  };
   res.render("urls_show", templateVars);
 });
 
+//Get/u/Generic Short UTRL
+app.get("/u/:shortURL", (req, res) => {
+  const user = usersDBLookup(req.cookies["user_id"]);
+  let templateVars = {
+    user: user,
+    longURL: urlDatabase[req.params.shortURL]
+  };
+  res.redirect(templateVars.longURL);
+});
+
+//Get/Registration Page
+app.get("/register", (req, res) => {
+ 
+  res.render("urls_register");
+})
+
+//Get/Login
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+})
+
+//Pass entire User Object 
+function usersDBLookup (userID) {
+  for (key in usersDB) {
+    if (userID === key) {
+      return usersDB[key];
+    }
+  }
+}
+
+//========== POST METHODS ===========
+
+//Post /URLS
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
@@ -103,17 +145,34 @@ app.post("/urls/:id", (req, res) => {
 
 //Post/Login
 app.post("/login", (req, res) => {
-  let username = req.body.username;
-  res.cookie('username', username);
+  let email = req.body.email;
+  let password = req.body.password;
+
+  let validation = false;
+
+  if (!email || !password) {
+    res.send("error");
+    res.status(403);
+  } 
+  for (var userID in usersDB) {
+    let user = usersDB[userID];
+    if (email === user.email && password === user.password) {
+        res.cookie("user_id", user.id);
+        break;
+      }
+  }
   res.redirect("/urls");
 });
 
 //Post/Logout
 app.post("/logout", (req, res) => {
+  //const user = usersDBLookup(req.cookies["user_id"]);
+
+  console.log(user)
   let templateVars = {
-    username: req.cookies["username"],
+    user: user,
   };
-  res.clearCookie('username', templateVars);
+  res.clearCookie('user_id', templateVars);
   res.redirect("/urls");
 });
 
@@ -121,33 +180,38 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  let newUser = {
-    id: generateRandomString(),
-    email: email,
-    password: password 
-  }; 
-  users[newUser.id] = newUser;
-  //console.log(users)
-  res.cookie("user_id", newUser.id)
-  res.cookie("email", newUser.email);
-  res.redirect("/register");
+
+  //Check for Errors
+  let validation = true;
+  let error = "";
+
+  if (!email ||!password) {
+    validation = false;
+    res.status(400);
+    // error: "Please enter your email address";
+    res.redirect("/register");
+  } 
+  for (user in usersDB) {
+    if (email === usersDB[user].email) {
+      validation = false;
+      res.status(400);
+      // error: "This e-mail address is already registered. Please enter a different one";
+      res.redirect("/register");
+    }
+  }
+
+  //Adds newUser to User Object
+  if (validation) {
+    let user = {
+      id: generateRandomString(),
+      email: email,
+      password: password 
+    }; 
+    usersDB[user.id] = user;
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  }
+
 });
-
-app.get("/u/:shortURL", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-    longURL: urlDatabase[req.params.shortURL]
-  };
-  res.redirect(templateVars.longURL);
-});
-//Get/Registration Page
-app.get("/register", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"],
-  };
-  res.render("urls_register", templateVars);
-})
-
-
 
 
