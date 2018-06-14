@@ -103,6 +103,16 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//Post/Register
+app.post("/register", (req, res) => {
+  let templateVars = {
+    email: req.body.email,
+    password: req.body.password
+  };
+  console.log(templateVars)
+  res.redirect("/register");
+});
+
 app.get("/u/:shortURL", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
@@ -110,7 +120,13 @@ app.get("/u/:shortURL", (req, res) => {
   };
   res.redirect(templateVars.longURL);
 });
-
+//Get/Registration Page
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"],
+  };
+  res.render("urls_register", templateVars);
+})
 
 
 
