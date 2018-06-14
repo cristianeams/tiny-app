@@ -32,12 +32,26 @@ function generateRandomString() {
     result += possibilities.charAt(Math.floor(Math.random() * possibilities.length)); 
   }
 
-  return result
+  return result;
 };
 
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
+};
+
+//Creates an User Object
+const users = { 
+//   "userRandomID": {
+//     id: this.id, 
+//     email: "user@example.com", 
+//     password: "purple-monkey-dinosaur"
+//   },
+//  "user2RandomID": {
+//     id: "user2RandomID", 
+//     email: "user2@example.com", 
+//     password: "dishwasher-funk"
+//   }
 };
 
 app.get("/urls", (req, res) => {
@@ -105,11 +119,16 @@ app.post("/logout", (req, res) => {
 
 //Post/Register
 app.post("/register", (req, res) => {
-  let templateVars = {
-    email: req.body.email,
-    password: req.body.password
-  };
-  console.log(templateVars)
+  let email = req.body.email;
+  let password = req.body.password;
+  let newUser = {
+    id: generateRandomString(),
+    email: email,
+    password: password 
+  }; 
+  users[newUser.id] = newUser;
+  res.cookie('user_id', newUser.id);
+  console.log(users);
   res.redirect("/register");
 });
 
