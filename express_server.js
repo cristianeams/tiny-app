@@ -14,7 +14,7 @@ app.use(cookieParser());
 //Start the server
 const PORT = 8080;
 app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
+  console.log(`Example app listening on port ${PORT}`);
 });
 
 //Sets Ejs as templating engine
@@ -25,66 +25,90 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 function generateRandomString() {
-    let result = "";
-    const possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for (let i = 0; i < 6; i++) { 
-      result += possibilities.charAt(Math.floor(Math.random() * possibilities.length)); 
-    }
-    
-    return result;
+  for (let i = 0; i < 6; i++) { 
+    result += possibilities.charAt(Math.floor(Math.random() * possibilities.length)); 
+  }
+
+  return result
 };
 
 let urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com",
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com",
 };
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { 
+    urls: urlDatabase, 
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 
 //Get Route to Show the Form
 //The new route matches :id pattern, so defining it before will take precedence.
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["username"],
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-    let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
-    res.render("urls_show", templateVars);
+  let templateVars = { shortURL: req.params.id, 
+    longURL: urlDatabase[req.params.id], 
+    username: req.cookies["username"]};
+  res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-    let shortURL = generateRandomString();
-    let longURL = req.body.longURL;
-    urlDatabase[shortURL] = longURL;
-    res.redirect("/urls/");
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect("/urls/");
 });
 
-//Post route to remove an URL
+//Post/Remove an URL
 app.post("/urls/:id/delete", (req, res) => {
-    delete urlDatabase[req.params.id];
-   res.redirect("/urls");
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
 });
 
-//Post route to update an URL
+//Post/Update an URL
 //Set id to params
 //Change longURL to the new value of newURL
 app.post("/urls/:id", (req, res) => {
-    let id = req.params.id;
-    let longURL = req.body.longURL;
-    urlDatabase[id] = longURL;
-   res.redirect("/urls");
-
+  let id = req.params.id;
+  let longURL = req.body.longURL;
+  urlDatabase[id] = longURL;
+  res.redirect("/urls");
 });
 
+//Post/Login
+app.post("/login", (req, res) => {
+  let username = req.body.username;
+  res.cookie('username', username);
+  res.redirect("/urls");
+});
+
+//Post/Logout
+app.post("/logout", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"],
+  };
+  res.clearCookie('username', templateVars);
+  res.redirect("/urls");
+});
 
 app.get("/u/:shortURL", (req, res) => {
-    //console.log(req.params.shortURL)
-    let longURL = urlDatabase[req.params.shortURL];
-    res.redirect(longURL);
+  let templateVars = {
+    username: req.cookies["username"],
+    longURL: urlDatabase[req.params.shortURL]
+  };
+  res.redirect(templateVars.longURL);
 });
 
 
