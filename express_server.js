@@ -45,7 +45,7 @@ const usersDB = {
   "user1RandomID": {
     id: "user1RandomID",
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "123"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -72,9 +72,9 @@ app.get("/urls", (req, res) => {
 //Get Route to Show the Form
 //The new route matches :id pattern, so defining it before will take precedence.
 app.get("/urls/new", (req, res) => {
-  const user = usersDBLookup(req.cookies["user_id"]);
+  const currentUser = usersDBLookup(req.cookies["user_id"]);
   let templateVars = {
-    users: user
+    currentUser: currentUser,
   };
   res.render("urls_new", templateVars);
 });

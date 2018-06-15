@@ -1,5 +1,5 @@
 <!-- views/partials/ _header.ejs-->
-<%console.log(locals.currentUser)%>
+
   <div class="container">
        <% if (locals.currentUser === undefined) { %>
         <button type="submit" value="Register" class="btn btn-primary"><a href="/register" style="color: white">Register</button></a>
@@ -10,6 +10,10 @@
       <h1>Welcome back</h1>
       <form method="POST" action="/logout">
         <button type="submit" value="Log Out" class="btn btn-dark">Log Out</button>
+      </form>
+      <br>
+      <form method="GET" action="/urls/new">
+        <button type="submit" value="Add" class="btn btn-success">New</button>
       </form>
       <% } %> 
   </div>
