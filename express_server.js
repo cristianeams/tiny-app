@@ -58,11 +58,12 @@ const usersDB = {
 //========= GET METHODS ======
 
 app.get("/urls", (req, res) => {
-  const user = usersDBLookup(req.cookies["user_id"]);
+  const currentUser = usersDBLookup(req.cookies["user_id"]);
   //console.log(req.cookies["user_id"]);
   let templateVars = { 
     urls: urlDatabase, 
-    user: usersDB
+    user: usersDB,
+    currentUser: currentUser,
   };
   
   res.render("urls_index", templateVars);
@@ -151,28 +152,25 @@ app.post("/login", (req, res) => {
   let validation = false;
 
   if (!email || !password) {
-    res.send("error");
-    res.status(403);
-  } 
-  for (var userID in usersDB) {
-    let user = usersDB[userID];
-    if (email === user.email && password === user.password) {
+    res.status(403).render('urls_login', {error: 'Please enter a valid e-mail address and password'} ) 
+  } else {
+    for (var userID in usersDB) {
+      let user = usersDB[userID];
+      if (email === user.email && password === user.password) {
+        validation = true;
         res.cookie("user_id", user.id);
-        break;
+        res.redirect("/urls");
       }
-  }
-  res.redirect("/urls");
+    }
+    if (!validation){
+      res.status(403).render('urls_login', {error: 'Wrong Password'} ) ;
+    } 
+  } 
 });
 
 //Post/Logout
 app.post("/logout", (req, res) => {
-  //const user = usersDBLookup(req.cookies["user_id"]);
-
-  console.log(user)
-  let templateVars = {
-    user: user,
-  };
-  res.clearCookie('user_id', templateVars);
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -193,6 +191,7 @@ app.post("/register", (req, res) => {
   } 
   for (user in usersDB) {
     if (email === usersDB[user].email) {
+      console.log(email === usersDB[user].email)
       validation = false;
       res.status(400);
       // error: "This e-mail address is already registered. Please enter a different one";
@@ -207,6 +206,7 @@ app.post("/register", (req, res) => {
       email: email,
       password: password 
     }; 
+    
     usersDB[user.id] = user;
     res.cookie("user_id", user.id);
     res.redirect("/urls");
