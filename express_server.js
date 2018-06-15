@@ -7,11 +7,19 @@ const morgan = require('morgan');
 app.use(morgan('dev'));
 
 
-//Require and use Cookie Parser
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
+//Require and use Cookie Sessions
+const cookieSession = require('cookie-session')
+//const cookieParser = require('cookie-parser');
+//app.use(cookieSession());
+app.use(cookieSession({
+  name: 'user_id',
+  keys: ['key1', 'key2'],
+}));
 
-//Start the server
+//Require BCCryptJS
+const bcrypt = require('bcryptjs');
+
+//Start sserver
 const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
@@ -24,6 +32,36 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+//=======Databases =========
+
+let urlDatabase = {
+  "b2xVn2": {url: "http://www.lighthouselabs.ca", userId: 'user1RandomID'},
+  "9sm5xK": {url: "http://www.google.com", userId: 'user2RandomID'},
+  
+};
+
+//Creates an users Database 
+const usersDB = { 
+//   "user1RandomID": {
+//     id: "user1RandomID",
+//     email: "user@example.com", 
+//     password: "123"
+//   },
+//  "user2RandomID": {
+//     id: "user2RandomID", 
+//     email: "user2@example.com", 
+//     password: "456"
+//   },
+  "admin": {
+    id: "admin",
+    email: "123@123",
+    password: bcrypt.hashSync("123", 10)
+  }
+};
+
+
+//======Functions ======
+
 function generateRandomString() {
   let result = "";
   const possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -35,34 +73,41 @@ function generateRandomString() {
   return result;
 };
 
-let urlDatabase = {
-  "b2xVn2": {url: "http://www.lighthouselabs.ca", userId: 'user1RandomID'},
-  "9sm5xK": {url: "http://www.google.com", userId: 'user2RandomID'},
-  
+function urlsForUser(id) {
+  //let userId = req.cookies.user_id;
+  const result = {};
+  for (let shortURL in urlDatabase) {
+    if (id === urlDatabase[shortURL].userId) {
+      result[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return result;
 };
 
-//Creates an users Database 
-const usersDB = { 
-  "user1RandomID": {
-    id: "user1RandomID",
-    email: "user@example.com", 
-    password: "123"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "456"
+//Pass entire User Object 
+function usersDBLookup (userID) {
+  for (key in usersDB) {
+    if (userID === key) {
+      return usersDB[key];
+    }
   }
-};
+}
 
 
 //========= GET METHODS ======
 
+app.get("/", (req, res) => {
+  res.redirect("/login");
+});
+
 app.get("/urls", (req, res) => {
-  const currentUser = usersDBLookup(req.cookies["user_id"]);
-  //console.log(req.cookies["user_id"]);
+  const currentUser = usersDBLookup(req.session.user_id);
+  if (!currentUser) {
+    res.redirect("/login");
+    return;
+  } 
   let templateVars = { 
-    urls: urlDatabase, 
+    urls: urlsForUser(currentUser.id), 
     user: usersDB,
     currentUser: currentUser,
   };
@@ -72,7 +117,7 @@ app.get("/urls", (req, res) => {
 //Get Route to Show the Form
 //The new route matches :id pattern, so defining it before will take precedence.
 app.get("/urls/new", (req, res) => {
-  const currentUser = usersDBLookup(req.cookies["user_id"]);
+  const currentUser = usersDBLookup(req.session.user_id);
   let templateVars = {
     urls: urlDatabase, 
     currentUser: currentUser,
@@ -89,22 +134,36 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const user = usersDBLookup(req.cookies["user_id"]);
-  let templateVars = { shortURL: req.params.id, 
-    longURL: urlDatabase[req.params.id].url, 
+  const user = usersDBLookup(req.session.user_id);
+  if (!user === undefined ) {
+    return res.redirect("/login");
+  }
+  let shortURL = req.params.id;
+  let urlObject = urlDatabase[shortURL];
+  if (user.id !== urlObject.userId) {
+    res.status(401).send("You are not authorized.");
+    return;
+  }
+  let templateVars = { shortURL: shortURL,
+    longURL: urlDatabase[shortURL].url, 
     user: user
   };
   res.render("urls_show", templateVars);
 });
 
+//Get /Public
+app.get("/public", (req, res) => {
+  const currentUser = req.session.user_id;
+  let templateVars = { 
+    urls: urlDatabase,
+    currentUser: currentUser,
+  };
+  res.render("urls_public", templateVars);
+});
+
 //Get/u/Generic Short UTRL
 app.get("/u/:shortURL", (req, res) => {
-  const user = usersDBLookup(req.cookies["user_id"]);
-  let templateVars = {
-    user: user,
-    longURL: urlDatabase[req.params.shortURL]
-  };
-  res.redirect(templateVars.longURL);
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 //Get/Registration Page
@@ -117,35 +176,27 @@ app.get("/login", (req, res) => {
   res.render("urls_login");
 })
 
-//Pass entire User Object 
-function usersDBLookup (userID) {
-  for (key in usersDB) {
-    if (userID === key) {
-      return usersDB[key];
-    }
-  }
-}
+
 
 //========== POST METHODS ===========
 
 //Post /URLS
 app.post("/urls", (req, res) => {
-  let currentUser = req.cookies["user_id"];
+  let currentUser = req.session.user_id;
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
   let templateVars = {
-    'userID': currentUser,
+    'userId': currentUser,
     'url': longURL
   };
   urlDatabase[shortURL] = templateVars;
-  console.log(urlDatabase)
   res.redirect("/urls/");
   
 });
 
 //Post/Remove an URL
 app.post("/urls/:id/delete", (req, res) => {
-  let userId = req.cookies.user_id;
+  let userId = req.session.user_id
   const {id} = req.params;
   if (userId === urlDatabase[id].userId ) {
     delete urlDatabase[id];
@@ -160,15 +211,8 @@ app.post("/urls/:id/delete", (req, res) => {
 //Change longURL to the new value of newURL
 
 app.post("/urls/:id", (req, res) => {
-  let userId = req.cookies.user_id;
-  //console.log(userId);
-  // console.log(req.params);
-  // console.log(req.body);
-
+  let userId = req.session.user_id
   let urlID = urlDatabase[req.params.id];
-  //console.log(urlID.userId);
-  //console.log(userId);
-
   if (urlID.userId === userId) {
     urlID.longURL = req.body.longURL;
     //Updates longURL in database
@@ -187,51 +231,48 @@ app.post("/login", (req, res) => {
   let password = req.body.password;
 
   let validation = false;
-
   if (!email || !password) {
     res.status(403).render('urls_login', {error: 'Please enter a valid e-mail address and password'} ) 
   } else {
     for (var userID in usersDB) {
       let user = usersDB[userID];
-      if (email === user.email && password === user.password) {
-        validation = true;
-        res.cookie("user_id", user.id);
-        res.redirect("/urls");
-      }
+      if (email === user.email ) {
+        let checkedPassword = bcrypt.compareSync(password, user.password);
+
+        if (checkedPassword){
+          req.session.user_id = user.id;
+          res.redirect("/urls");
+        } 
+     }
     }
-    if (!validation){
-      res.status(403).render('urls_login', {error: 'Wrong Password'} ) ;
-    } 
   } 
+  res.redirect("/urls");
 });
 
 //Post/Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
-  res.redirect("/urls");
+  req.session = null;
+  res.redirect("/login");
 });
 
 //Post/Register
 app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   //Check for Errors
-  let validation = true;
-  let error = "";
+  let validations= true;
 
   if (!email ||!password) {
     validation = false;
     res.status(400);
-    // error: "Please enter your email address";
     res.redirect("/register");
   } 
   for (user in usersDB) {
     if (email === usersDB[user].email) {
-      console.log(email === usersDB[user].email)
       validation = false;
       res.status(400);
-      // error: "This e-mail address is already registered. Please enter a different one";
       res.redirect("/register");
     }
   }
@@ -241,14 +282,14 @@ app.post("/register", (req, res) => {
     let user = {
       id: generateRandomString(),
       email: email,
-      password: password 
+      password: hashedPassword
     }; 
-    
+
     usersDB[user.id] = user;
-    res.cookie("user_id", user.id);
+    //res.cookie("user_id", user.id);
+    req.session.user_id = user.id;
     res.redirect("/urls");
   }
-
 });
 
 
