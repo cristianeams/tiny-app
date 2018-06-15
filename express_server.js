@@ -171,30 +171,14 @@ app.post("/urls/:id", (req, res) => {
 
   if (urlID.userId === userId) {
     urlID.longURL = req.body.longURL;
-    
-    console.log(urlID.longURL)
-    console.log(req.body.longURL)
-    //gets updated value but its not updating in the url
-
+    //Updates longURL in database
+    urlDatabase[req.params.id].url = urlID.longURL;
     res.redirect("/urls");
   }
   else {
     res.send(401);
     return;
   }
-
-  //urlDatabase[userId].longURL = req.body.longURL;
-
-
-  // for (let item in urlDatabase ) {
-  //   if (userId !== urlDatabase[item].userId ) {
-  //     res.send('usuario diferente');
-  //     return;
-  //   }
-  //   console.log(req.params);
-    
-  // }
-
 });
 
 //Post/Login
