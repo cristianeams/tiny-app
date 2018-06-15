@@ -1,26 +1,16 @@
 <!-- views/partials/ _header.ejs-->
-
-<!DOCTYPE html>
-<html style="font-family: 'Roboto', sans-serif">
-<head>
-  <title>Tiny App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-</head>
-<body>
+<%console.log(locals.currentUser)%>
   <div class="container">
-    <% if(!username){ %>
-      <form method="POST" action="/login">
-        <input type="text" name="username"></input>
-        <button type="submit" value="Log In" class="btn btn-primary">Log In</button> 
-      </form> 
-    <% } else{ %>  
-      <h2>Hi, <%= username %></h1>
+       <% if (locals.currentUser === undefined) { %>
+        <button type="submit" value="Register" class="btn btn-primary"><a href="/register" style="color: white">Register</button></a>
+        <button type="logout" value="Log In" class="btn btn-dark"><a href="/login" style="color: white">Log In</button></a>
+
+      <% } else { %>
+
+      <h1>Welcome back</h1>
       <form method="POST" action="/logout">
-          <input type="text" name="username"></input>
-          <button type="logout" value="Log Out" class="btn btn-dark">Log Out</button> 
-      </form> 
-    <% } %>
+        <button type="submit" value="Log Out" class="btn btn-dark">Log Out</button>
+      </form>
+      <% } %> 
   </div>
-</body>
-</html>
+
