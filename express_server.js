@@ -158,12 +158,43 @@ app.post("/urls/:id/delete", (req, res) => {
 //Post/Update an URL
 //Set id to params
 //Change longURL to the new value of newURL
+
 app.post("/urls/:id", (req, res) => {
   let userId = req.cookies.user_id;
-  let id = req.params.id;
-  let longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
-  res.redirect("/urls");
+  //console.log(userId);
+  // console.log(req.params);
+  // console.log(req.body);
+
+  let urlID = urlDatabase[req.params.id];
+  //console.log(urlID.userId);
+  //console.log(userId);
+
+  if (urlID.userId === userId) {
+    urlID.longURL = req.body.longURL;
+    
+    console.log(urlID.longURL)
+    console.log(req.body.longURL)
+    //gets updated value but its not updating in the url
+
+    res.redirect("/urls");
+  }
+  else {
+    res.send(401);
+    return;
+  }
+
+  //urlDatabase[userId].longURL = req.body.longURL;
+
+
+  // for (let item in urlDatabase ) {
+  //   if (userId !== urlDatabase[item].userId ) {
+  //     res.send('usuario diferente');
+  //     return;
+  //   }
+  //   console.log(req.params);
+    
+  // }
+
 });
 
 //Post/Login
