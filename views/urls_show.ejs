@@ -6,16 +6,15 @@
   <% include partials/_head %>
 </head>
 <body>
+
   <% include partials/_header %>
-  
   <div class="container">   
-    <h1 class="display-5 ml-1 p-3">Short URL</h1>
-    <a href="/urls" class="btn btn-secondary">Back to URLs</a>
+    
     <div class="form-group">
       <!-- EJS Code -->
-      <h2>Short Url: <%= shortURL %> </h2> 
+      <h2 style="margin-bottom: .5em">Short URL: <%= shortURL %> </h2> 
       <form method="POST" action="/urls/<%= shortURL %>" class="form-control">
-        <input type="text" class="form-control" value="<%= longURL %>" name="longURL"></input>
+        <input type="text" class="form-control" value="<%= longURL %>" style="margin-bottom: .5em" name="longURL"></input>
         <button type="update" value="<%= longURL %>" class="btn btn-info">Update</button>
       </form>  
     </div>

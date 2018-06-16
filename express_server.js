@@ -9,8 +9,7 @@ app.use(morgan('dev'));
 
 //Require and use Cookie Sessions
 const cookieSession = require('cookie-session')
-//const cookieParser = require('cookie-parser');
-//app.use(cookieSession());
+
 app.use(cookieSession({
   name: 'user_id',
   keys: ['key1', 'key2'],
@@ -55,7 +54,7 @@ const usersDB = {
   "admin": {
     id: "admin",
     email: "123@123",
-    password: bcrypt.hashSync("123", 10)
+    hashedPassword: bcrypt.hashSync("123", 10)
   }
 };
 
@@ -93,6 +92,17 @@ function usersDBLookup (userID) {
   }
 }
 
+function validateLogin(data){
+  let email = data.email;
+  let password = data.password;
+  for(let key in usersDB) {
+    var user = usersDB[key];
+    if (user.email === email && bcrypt.compareSync(password, user.hashedPassword) ) {
+      return user;
+    }
+  }
+  return false;
+ }
 
 //========= GET METHODS ======
 
@@ -114,8 +124,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//Get Route to Show the Form
-//The new route matches :id pattern, so defining it before will take precedence.
+//Get/New Links 
 app.get("/urls/new", (req, res) => {
   const currentUser = usersDBLookup(req.session.user_id);
   let templateVars = {
@@ -129,13 +138,10 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-app.get("/urls.json", (req, res) => {
-  return res.json(urlDatabase);
-});
-
+//Get/URLS
 app.get("/urls/:id", (req, res) => {
   const user = usersDBLookup(req.session.user_id);
-  if (!user === undefined ) {
+  if (user === undefined ) {
     return res.redirect("/login");
   }
   let shortURL = req.params.id;
@@ -146,7 +152,7 @@ app.get("/urls/:id", (req, res) => {
   }
   let templateVars = { shortURL: shortURL,
     longURL: urlDatabase[shortURL].url, 
-    user: user
+    currentUser: user
   };
   res.render("urls_show", templateVars);
 });
@@ -163,7 +169,10 @@ app.get("/public", (req, res) => {
 
 //Get/u/Generic Short UTRL
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL].longURL);
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL].url;
+
+  res.redirect(longURL);
 });
 
 //Get/Registration Page
@@ -202,7 +211,7 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[id];
     return res.redirect("/urls");
   } else {
-    return res.sendStatus(401);
+    return res.status(403).render('urls_index', {error: 'You dont have permission to delete this file'} ) ;
   }
 });
 
@@ -227,28 +236,24 @@ app.post("/urls/:id", (req, res) => {
 
 //Post/Login
 app.post("/login", (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
-
-  let validation = false;
-  if (!email || !password) {
-    res.status(403).render('urls_login', {error: 'Please enter a valid e-mail address and password'} ) 
+  const email = req.body.email;
+  const password = req.body.password;
+ 
+  const data = {
+    email: email,
+    password: password
+  }
+  const validUser = validateLogin(data);
+  
+  if(validUser) {
+    req.session.user_id = validUser.id;
+    res.redirect("/urls");
   } else {
-    for (var userID in usersDB) {
-      let user = usersDB[userID];
-      if (email === user.email ) {
-        let checkedPassword = bcrypt.compareSync(password, user.password);
-
-        if (checkedPassword){
-          req.session.user_id = user.id;
-          res.redirect("/urls");
-        } 
-     }
-    }
-  } 
-  res.redirect("/urls");
+    res.render('urls_login', {error: 'You are not an user. Please register to use Tiny App.'} ) ;
+    return;
+  }
 });
-
+ 
 //Post/Logout
 app.post("/logout", (req, res) => {
   req.session = null;
@@ -261,13 +266,18 @@ app.post("/register", (req, res) => {
   let password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  //Check for Errors
-  let validations= true;
+  console.log(email);
+  console.log(password);
+  console.log(hashedPassword);
 
-  if (!email ||!password) {
+  //Check for Errors
+  let validation = true;
+
+  if (!email || !password) {
     validation = false;
-    res.status(400);
-    res.redirect("/register");
+    // res.status(400);
+    res.status(400).render('urls_register', {error: 'Please enter a valid e-mail address and password'});
+    // res.redirect("/register");
   } 
   for (user in usersDB) {
     if (email === usersDB[user].email) {
@@ -277,16 +287,15 @@ app.post("/register", (req, res) => {
     }
   }
 
-  //Adds newUser to User Object
   if (validation) {
     let user = {
       id: generateRandomString(),
       email: email,
-      password: hashedPassword
+      hashedPassword
     }; 
-
+    //Adds user to usersDB
     usersDB[user.id] = user;
-    //res.cookie("user_id", user.id);
+    
     req.session.user_id = user.id;
     res.redirect("/urls");
   }
