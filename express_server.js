@@ -143,7 +143,6 @@ app.get("/urls/:id", (req, res) => {
 
 //Get/Public
 app.get("/public", (req, res) => {
-
   const user = usersDBLookup(req.session.user_id);
   let templateVars = { 
     urls: urlDatabase,
@@ -245,10 +244,6 @@ app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-
-  console.log(email);
-  console.log(password);
-  console.log(hashedPassword);
 
   //Check for Errors
   let validation = true;

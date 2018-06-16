@@ -8,8 +8,8 @@
 <body>
  
     <% include partials/_header %>
-  <div class="container"> 
-    <h1 class="display-5 ml-1 p-3">Links</h1>
+  <div class="container form-control"> 
+    <h2 class="dark-title">Links</h2>
     <table class="table table">
       <thead>
         <tr>
@@ -24,7 +24,7 @@
           <tr> 
               <th scope="row">#</th>
               <td><%= item %></td>
-              <td><a href="<%= urls[item].url %>"><%= urls[item].url %></a></td>
+              <td><a href="<%= urls[item].url %>" class="blue-url"><%= urls[item].url %></a></td>
               <td>
               
           </tr>

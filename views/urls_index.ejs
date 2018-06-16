@@ -8,8 +8,8 @@
 <body>
   <% include partials/_header %>
   
-  <div class="container"> 
-    <h1 class="display-5 ml-1 p-3">Your short URLs</h1>
+  <div class="container form-control"> 
+    <h2 class="dark-title">Your short URLs</h2>
     <table class="table table">
       <thead>
         <tr>
@@ -19,23 +19,25 @@
           <th scope="col">Actions:</th>
         </tr>
       </thead>
-        <tbody>
-          <!-- EJS Code -->
-          <% for (var item in urls) { %>
+      <tbody>
+        <!-- EJS Code -->
+        <% for (var item in urls) { %>
           <tr> 
-              <th scope="row">#</th>
+            <th scope="row">#</th>
               <td><%= item %></td>
-              <td><a href="<%= urls[item].url %>"><%= urls[item].url %></a></td>
+              <td><a href="<%= urls[item].url %>" class="blue-url"><%= urls[item].url %></a></td>
               <td>
-                <button type="edit" value="Edit" class="btn btn-secondary"><a href="/urls/<%= item %>" style="color: white">Edit</button></a></td>
+                <a href="/urls/<%= item %>"><button type="edit" value="Edit" class="btn btn-secondary">Edit</button></a></td>
               <td>
                 <form method="POST" action="/urls/<%= item %>/delete">
-              <button type="delete" value="Delete" class="btn btn-danger">Delete</button>
-              </form></td>
+                <button type="delete" value="Delete" class="btn btn-danger">Delete</button>
+                </form>
+              </td>
           </tr>
-          <% }; %>   
-        </tbody>
+        <% }; %>   
+      </tbody>
     </table>
   </div>  
+  <% include partials/_footer %>
 </body>
 </html>

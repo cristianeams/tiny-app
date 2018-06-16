@@ -1,16 +1,16 @@
 <!-- views/partials/ _header.ejs-->
 
   <div class="container">
-      <h1 style="font-size: 7rem; margin:.5em 0 .5em 0; color:#0099ff">Tiny App</h1>
+      <h1>Tiny App <i class="far fa-hand-scissors"></i></h1>
   
        <% if (locals.currentUser === undefined) { %>
-        <button type="submit" value="Register" class="btn btn-primary"><a href="/register" style="color: white">Register</button></a>
-        <button type="logout" value="Log In" class="btn btn-dark"><a href="/login" style="color: white">Log In</button></a>
+        <a href="/register"><button type="submit" value="Register" class="btn btn-primary">Register</button></a>
+        <a href="/login"><button type="logout" value="Log In" class="btn btn-dark">Log In</button></a>
 
       <% } else { %>
 
-      <h2>Welcome back,  <%= currentUser.email %></h2><form method="POST" action="/logout">
-        <button type="submit" value="Log Out" class="btn btn-dark" style="margin-bottom: 2em">Log Out</button>
+      <h3>Welcome back,  <%= currentUser.email %></h3><form method="POST" action="/logout">
+        <button type="submit" value="Log Out" class="btn btn-secondary" style="margin-bottom: 2em">Log Out</button>
       </form>
     
       <br>
@@ -18,7 +18,7 @@
       <br>
       <form method="GET" action="/urls/new">
         <br>
-        <button type="submit" value="Add" class="btn btn-success">Add a new Link</button>
+        <button type="submit" value="Add" class="btn  btn-primary">Add a new Link</button>
       </form>
       <br>
       

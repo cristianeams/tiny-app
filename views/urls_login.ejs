@@ -4,27 +4,29 @@
   <title>Tiny App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <% include partials/_head %>
-
 </head>
 <body>
   <div class="container">
-    
+      <h1>Tiny App <i class="far fa-hand-scissors"></i></h1>
       <% include partials/_error %>
-      <h1 style="margin-top: 1em">Login</h1>
+      <h2 style="margin-top: 1em">Login</h2>
       <form method="POST" action="/login" class="form-control">
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Enter your email">
+          <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Enter your email address">
         </div>
+
         <div class="form-group">
           <label for="exampleInputPassword1">Password</label>
           <input type="password" class="form-control" name="password" placeholder="Password">
         </div>
+
         <button type="submit" value="Submit" class="btn btn-primary">Log In</button>
       </form>  
 
       <h2>Don't have an account yet?</h2>
-      <button type="submit" value="Register" class="btn btn-secondary"><a href="/register" style="color: white">Register</button></a>
-    </body>
+      <a href="/register" style="color: white"><button type="submit" value="Register" class="btn btn-secondary">Register</button></a>
   </div>
+  <% include partials/_footer %>
+</body>  
 </html>

@@ -8,11 +8,11 @@
 <body>
 
   <% include partials/_header %>
-  <div class="container">   
+  <div class="container form-control">   
     
     <div class="form-group">
       <!-- EJS Code -->
-      <h2 style="margin-bottom: .5em">Short URL: <%= shortURL %> </h2> 
+      <h2 style="margin-bottom: .5em" class="dark-title">Short URL: <%= shortURL %> </h2> 
       <form method="POST" action="/urls/<%= shortURL %>" class="form-control">
         <input type="text" class="form-control" value="<%= longURL %>" style="margin-bottom: .5em" name="longURL"></input>
         <button type="update" value="<%= longURL %>" class="btn btn-info">Update</button>
