@@ -1,15 +1,13 @@
-//Require express and Initialize expresss
+//Require Initialize expresss
 const express = require("express");
 const app = express();
 
-//Require and Use morgan
+//Require morgan
 const morgan = require('morgan');
 app.use(morgan('dev'));
 
-
-//Require and use Cookie Sessions
+//Require cookie-session
 const cookieSession = require('cookie-session')
-
 app.use(cookieSession({
   name: 'user_id',
   keys: ['key1', 'key2'],
@@ -18,46 +16,34 @@ app.use(cookieSession({
 //Require BCCryptJS
 const bcrypt = require('bcryptjs');
 
-//Start sserver
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
-
-//Sets Ejs as templating engine
-app.set("view engine", "ejs");
-
-//Require and Use Body Parser Library to acccess Post Request Parameters
+//Require body-parser
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+
+//Sets Ejs as templating engines
+app.set("view engine", "ejs");
+
+//Start server
+const PORT = 8080;
+app.listen(PORT, () => {
+  console.log(`Tiny App running on port ${PORT}`);
+});
+
 
 //=======Databases =========
 
 let urlDatabase = {
   "b2xVn2": {url: "http://www.lighthouselabs.ca", userId: 'user1RandomID'},
   "9sm5xK": {url: "http://www.google.com", userId: 'user2RandomID'},
-  
 };
 
-//Creates an users Database 
 const usersDB = { 
-//   "user1RandomID": {
-//     id: "user1RandomID",
-//     email: "user@example.com", 
-//     password: "123"
-//   },
-//  "user2RandomID": {
-//     id: "user2RandomID", 
-//     email: "user2@example.com", 
-//     password: "456"
-//   },
   "admin": {
     id: "admin",
     email: "123@123",
     hashedPassword: bcrypt.hashSync("123", 10)
   }
 };
-
 
 //======Functions ======
 
@@ -68,12 +54,10 @@ function generateRandomString() {
   for (let i = 0; i < 6; i++) { 
     result += possibilities.charAt(Math.floor(Math.random() * possibilities.length)); 
   }
-
   return result;
 };
 
 function urlsForUser(id) {
-  //let userId = req.cookies.user_id;
   const result = {};
   for (let shortURL in urlDatabase) {
     if (id === urlDatabase[shortURL].userId) {
@@ -90,19 +74,19 @@ function usersDBLookup (userID) {
       return usersDB[key];
     }
   }
-}
+};
 
 function validateLogin(data){
   let email = data.email;
   let password = data.password;
   for(let key in usersDB) {
-    var user = usersDB[key];
-    if (user.email === email && bcrypt.compareSync(password, user.hashedPassword) ) {
+    let user = usersDB[key];
+    if (user.email === email && bcrypt.compareSync(password, user.hashedPassword)) {
       return user;
     }
   }
   return false;
- }
+};
 
 //========= GET METHODS ======
 
@@ -157,12 +141,13 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//Get /Public
+//Get/Public
 app.get("/public", (req, res) => {
-  const currentUser = req.session.user_id;
+
+  const user = usersDBLookup(req.session.user_id);
   let templateVars = { 
     urls: urlDatabase,
-    currentUser: currentUser,
+    currentUser: user,
   };
   res.render("urls_public", templateVars);
 });
@@ -175,7 +160,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-//Get/Registration Page
+//Get/Registration 
 app.get("/register", (req, res) => {
   res.render("urls_register");
 })
@@ -185,11 +170,9 @@ app.get("/login", (req, res) => {
   res.render("urls_login");
 })
 
-
-
 //========== POST METHODS ===========
 
-//Post /URLS
+//Post/URLS
 app.post("/urls", (req, res) => {
   let currentUser = req.session.user_id;
   let shortURL = generateRandomString();
@@ -216,9 +199,6 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 //Post/Update an URL
-//Set id to params
-//Change longURL to the new value of newURL
-
 app.post("/urls/:id", (req, res) => {
   let userId = req.session.user_id
   let urlID = urlDatabase[req.params.id];
@@ -295,7 +275,6 @@ app.post("/register", (req, res) => {
     }; 
     //Adds user to usersDB
     usersDB[user.id] = user;
-    
     req.session.user_id = user.id;
     res.redirect("/urls");
   }

@@ -1,12 +1,21 @@
-# tiny-app
-A four-day project to build a web app using Node and ExpressJS.
+# TinyApp Project
 
-The app will allow users to shorten long URLs much like TinyURL.com and bit.ly do.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs much like TinyURL.com and bit.ly do.
 
-### Technologies:
-* Web Server: Node.js
-* Middleware: Express
-* Template Engine: EJS
+## Final Product
 
-## Let's get tinified!
+### Dependencies
+* Node.js
+* Express
+* EJS
+* bcryptjs
+* body-parser
+* cookie-session
+
+## Getting Started
+
+* Install all dependencies (using the `npm install` command)
+* Run the development web server using the `node express_server.js` command
+
+## Let's get TINYfied!
 
