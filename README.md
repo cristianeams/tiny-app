@@ -4,9 +4,9 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Screenshot of URLS page"](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-15%20at%208.50.49%20PM.png?raw=true)
-!["Screenshot of a new link](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-15%20at%208.52.04%20PM.png?raw=true)
-!["Screenshot of user's list of shortened URLS"](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-15%20at%208.52.09%20PM.png?raw=true)
+!["Screenshot of URLS page"](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-16%20at%202.06.46%20PM.png?raw=true)
+!["Screenshot of a new link](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-16%20at%202.07.28%20PM.png?raw=true)
+!["Screenshot of user's list of shortened URLS"](https://github.com/cristianeams/tiny-app/blob/master/docs/Screen%20Shot%202018-06-16%20at%202.07.37%20PM.png?raw=true)
 
 ### Dependencies
 * Node.js
