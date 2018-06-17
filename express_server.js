@@ -228,7 +228,7 @@ app.post("/login", (req, res) => {
     req.session.user_id = validUser.id;
     res.redirect("/urls");
   } else {
-    res.render('urls_login', {error: 'You are not an user. Please register to use Tiny App.'} ) ;
+    res.render('urls_login', {error: 'Login failed.'} ) ;
     return;
   }
 });
