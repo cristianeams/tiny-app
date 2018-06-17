@@ -173,10 +173,10 @@ app.get("/login", (req, res) => {
 
 //Post/URLS
 app.post("/urls", (req, res) => {
-  let currentUser = req.session.user_id;
-  let shortURL = generateRandomString();
-  let longURL = req.body.longURL;
-  let templateVars = {
+  const currentUser = req.session.user_id;
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  const templateVars = {
     'userId': currentUser,
     'url': longURL
   };
@@ -187,9 +187,9 @@ app.post("/urls", (req, res) => {
 
 //Post/Remove an URL
 app.post("/urls/:id/delete", (req, res) => {
-  let userId = req.session.user_id
+  const currentUser = req.session.user_id
   const {id} = req.params;
-  if (userId === urlDatabase[id].userId ) {
+  if (currentUser === urlDatabase[id].userId ) {
     delete urlDatabase[id];
     return res.redirect("/urls");
   } else {
@@ -199,9 +199,9 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Post/Update an URL
 app.post("/urls/:id", (req, res) => {
-  let userId = req.session.user_id
-  let urlID = urlDatabase[req.params.id];
-  if (urlID.userId === userId) {
+  const currentUser = req.session.user_id
+  const urlID = urlDatabase[req.params.id];
+  if (urlID.userId === currentUser) {
     urlID.longURL = req.body.longURL;
     //Updates longURL in database
     urlDatabase[req.params.id].url = urlID.longURL;
