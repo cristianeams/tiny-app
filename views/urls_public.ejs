@@ -23,7 +23,7 @@
           <% for (var item in urls) { %>
           <tr> 
               <th scope="row">#</th>
-              <td><%= item %></td>
+              <td><a href="<%= urls[item].url %>" class="blue-url"><%= item %></a></td>
               <td><a href="<%= urls[item].url %>" class="blue-url"><%= urls[item].url %></a></td>
               <td>
               

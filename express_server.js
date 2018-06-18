@@ -124,29 +124,29 @@ app.get("/urls/new", (req, res) => {
 
 //Get/URLS
 app.get("/urls/:id", (req, res) => {
-  const user = usersDBLookup(req.session.user_id);
-  if (user === undefined ) {
+  const currentUser = usersDBLookup(req.session.user_id);
+  if (currentUser === undefined ) {
     return res.redirect("/login");
   }
   let shortURL = req.params.id;
   let urlObject = urlDatabase[shortURL];
-  if (user.id !== urlObject.userId) {
+  if (currentUser.id !== urlObject.userId) {
     res.status(401).send("You are not authorized.");
     return;
   }
   let templateVars = { shortURL: shortURL,
     longURL: urlDatabase[shortURL].url, 
-    currentUser: user
+    currentUser: currentUser
   };
   res.render("urls_show", templateVars);
 });
 
 //Get/Public
 app.get("/public", (req, res) => {
-  const user = usersDBLookup(req.session.user_id);
+  const currentUser = usersDBLookup(req.session.user_id);
   let templateVars = { 
     urls: urlDatabase,
-    currentUser: user,
+    currentUser: currentUser,
   };
   res.render("urls_public", templateVars);
 });
@@ -154,9 +154,13 @@ app.get("/public", (req, res) => {
 //Get/u/Generic Short UTRL
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].url;
-
-  res.redirect(longURL);
+  let longURL = urlDatabase[shortURL];
+  if (longURL === undefined) {
+    return res.status(403).render('urls_new', {error: 'This url does not exist.'}) ;
+  } else {
+    let longURL = urlDatabase[shortURL].url;
+    return res.redirect(longURL);
+  } 
 });
 
 //Get/Registration 
@@ -250,10 +254,10 @@ app.post("/register", (req, res) => {
 
   if (!email || !password) {
     validation = false;
-    // res.status(400);
+  
     res.status(400).render('urls_register', {error: 'Please enter a valid e-mail address and password'});
-    // res.redirect("/register");
   } 
+  
   for (user in usersDB) {
     if (email === usersDB[user].email) {
       validation = false;
